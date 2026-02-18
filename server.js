@@ -270,7 +270,7 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(302, { Location: '/dashboard' });
         return res.end();
       }
-      return serveFile(res, path.join(STATIC_DIR, 'login.html'));
+      return serveFile(res, path.join(STATIC_DIR, 'views', 'login.html'));
     }
 
     // Dashboard page
@@ -280,7 +280,7 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(302, { Location: '/login' });
         return res.end();
       }
-      return serveFile(res, path.join(STATIC_DIR, 'dashboard.html'));
+      return serveFile(res, path.join(STATIC_DIR, 'views', 'dashboard.html'));
     }
 
     // Project editor: /projects/:uid
@@ -297,7 +297,7 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(302, { Location: '/dashboard' });
         return res.end();
       }
-      return serveFile(res, path.join(STATIC_DIR, 'editor.html'));
+      return serveFile(res, path.join(STATIC_DIR, 'views', 'editor.html'));
     }
 
     // ========== Static Files ==========
