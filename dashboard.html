@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pegasus Studio — Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a1a; color: #ddd;
+    font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px;
+  }
+  .topbar {
+    display: flex; align-items: center; padding: 8px 16px;
+    background: #2a2a2a; border-bottom: 1px solid #333;
+  }
+  .topbar .logo-area { flex: 1; display: flex; align-items: center; }
+  .topbar .user { color: #888; margin-right: 12px; font-size: 12px; }
+  .topbar .logout-btn {
+    background: none; border: 1px solid #444; color: #bbb; padding: 5px 12px;
+    border-radius: 3px; cursor: pointer; font-size: 11px; font-family: inherit;
+  }
+  .topbar .logout-btn:hover { border-color: #666; color: #ddd; }
+  .container { max-width: 960px; margin: 0 auto; padding: 28px 24px; }
+  .header { display: flex; align-items: center; margin-bottom: 20px; }
+  .header h2 { flex: 1; font-size: 14px; font-weight: 600; color: #bbb; }
+  .new-btn {
+    background: #3a5577; color: #ddd; border: 1px solid #4a6888; padding: 7px 16px;
+    border-radius: 3px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .new-btn:hover { background: #4a6888; color: #fff; }
+  .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .project-card {
+    background: #222; border-radius: 4px; padding: 16px;
+    border: 1px solid #333; cursor: pointer; transition: border-color 0.2s; position: relative;
+  }
+  .project-card:hover { border-color: #5577aa; }
+  .project-card h3 { margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #ddd; }
+  .project-card .meta { font-size: 11px; color: #666; }
+  .project-card .delete-btn {
+    position: absolute; top: 10px; right: 10px; background: none; border: none;
+    color: #555; font-size: 14px; cursor: pointer; padding: 2px 6px; line-height: 1;
+  }
+  .project-card .delete-btn:hover { color: #c55; }
+  .empty { text-align: center; color: #555; padding: 60px 0; font-size: 12px; }
+  .empty p { margin-bottom: 12px; }
+  .loading { text-align: center; color: #666; padding: 60px 0; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo-area">
+    <img src="/pegasus-logo.webp" alt="Pegasus Studio" style="height:28px;margin-right:10px;flex-shrink:0;">
+  </div>
+  <span class="user" id="username-display"></span>
+  <button class="logout-btn" id="logout-btn">Logout</button>
+</div>
+<div class="container">
+  <div class="header">
+    <h2>My Projects</h2>
+    <button class="new-btn" id="new-project-btn">+ New Project</button>
+  </div>
+  <div id="content"><div class="loading">Loading...</div></div>
+</div>
+
+<script>
+(function() {
+  var content = document.getElementById('content');
+  var usernameEl = document.getElementById('username-display');
+  var currentUser = null;
+
+  function api(method, url, body) {
+    var opts = { method: method, headers: {} };
+    if (body) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    return fetch(url, opts).then(function(r) {
+      return r.json().then(function(data) { return { status: r.status, data: data }; });
+    });
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function loadDashboard() {
+    Promise.all([api('GET', '/api/me'), api('GET', '/api/projects')])
+    .then(function(results) {
+      if (results[0].status === 401) { window.location.href = '/login'; return; }
+      currentUser = results[0].data.user;
+      usernameEl.textContent = currentUser.username;
+
+      var projects = results[1].data.projects || [];
+      render(projects);
+    }).catch(function() {
+      content.textContent = 'Failed to load. Please refresh.';
+    });
+  }
+
+  function render(projects) {
+    // Clear content
+    while (content.firstChild) content.removeChild(content.firstChild);
+
+    if (projects.length === 0) {
+      var emptyDiv = document.createElement('div');
+      emptyDiv.className = 'empty';
+      var p1 = document.createElement('p');
+      p1.textContent = 'No projects yet.';
+      var p2 = document.createElement('p');
+      p2.textContent = 'Click "+ New Project" to get started.';
+      emptyDiv.appendChild(p1);
+      emptyDiv.appendChild(p2);
+      content.appendChild(emptyDiv);
+      return;
+    }
+
+    var grid = document.createElement('div');
+    grid.className = 'projects';
+
+    for (var i = 0; i < projects.length; i++) {
+      (function(p) {
+        var card = document.createElement('div');
+        card.className = 'project-card';
+        card.setAttribute('data-uid', p.uid);
+
+        var delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.setAttribute('data-uid', p.uid);
+        delBtn.title = 'Delete';
+        delBtn.textContent = '\u00d7';
+        delBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!confirm('Delete this project? This cannot be undone.')) return;
+          api('DELETE', '/api/projects/' + p.uid).then(function(r) {
+            if (r.status === 200) loadDashboard();
+            else alert(r.data.error || 'Delete failed');
+          });
+        });
+
+        var h3 = document.createElement('h3');
+        h3.textContent = p.title;
+
+        var meta1 = document.createElement('div');
+        meta1.className = 'meta';
+        meta1.textContent = 'Created: ' + formatDate(p.createdAt);
+
+        var meta2 = document.createElement('div');
+        meta2.className = 'meta';
+        meta2.textContent = 'Updated: ' + formatDate(p.updatedAt);
+
+        card.appendChild(delBtn);
+        card.appendChild(h3);
+        card.appendChild(meta1);
+        card.appendChild(meta2);
+
+        card.addEventListener('click', function(e) {
+          if (e.target.classList.contains('delete-btn')) return;
+          window.location.href = '/projects/' + p.uid;
+        });
+
+        grid.appendChild(card);
+      })(projects[i]);
+    }
+
+    content.appendChild(grid);
+  }
+
+  document.getElementById('new-project-btn').addEventListener('click', function() {
+    var title = prompt('Project title:', 'My Project');
+    if (!title) return;
+    api('POST', '/api/projects', { title: title }).then(function(r) {
+      if (r.status === 200 && r.data.project) {
+        window.location.href = '/projects/' + r.data.project.uid;
+      } else if (r.status === 401) {
+        window.location.href = '/login';
+      } else {
+        alert(r.data.error || 'Failed to create project');
+      }
+    });
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', function() {
+    api('POST', '/api/logout').then(function() {
+      window.location.href = '/login';
+    });
+  });
+
+  loadDashboard();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# User data (sessions, credentials, projects)
+data/
+
+# Assets (downloaded via scripts/setup.sh)
+textures/
+models/kenney-*/
+models/catalog.json
+models/uploads/
+
+# Build output
+dist/
+
+# Backups & archives
+*.bak
+*.bak2
+*.zip
+
+# Local scene data
+scene.json
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

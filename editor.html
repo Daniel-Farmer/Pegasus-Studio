@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/">
+<title>Pegasus Studio</title>
+<link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+
+<div id="toolbar">
+      <a href="/dashboard" id="toolbar-logo" title="Dashboard"><img src="/pegasus-logo.webp" alt="Pegasus Studio"></a>
+      <div id="toolbar-menubar">
+        <div class="menu-item" data-menu="file">
+          <span class="menu-label">File</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" data-action="new">New Scene<span class="menu-shortcut">Ctrl+N</span></div>
+            <div class="menu-entry" data-action="load">Open Scene...<span class="menu-shortcut">Ctrl+O</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-entry" data-action="save">Save<span class="menu-shortcut">Ctrl+S</span></div>
+            <div class="menu-entry" data-action="save-server">Save to Server<span class="menu-shortcut">Ctrl+Shift+S</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-entry" data-action="export">Export HTML...</div>
+            <div class="menu-sep"></div>
+            <div class="menu-entry" data-action="scenes">Scene Manager...</div>
+          </div>
+        </div>
+        <div class="menu-item" data-menu="edit">
+          <span class="menu-label">Edit</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" data-action="undo">Undo<span class="menu-shortcut">Ctrl+Z</span></div>
+            <div class="menu-entry" data-action="redo">Redo<span class="menu-shortcut">Ctrl+Y</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-entry" data-action="duplicate">Duplicate<span class="menu-shortcut">Ctrl+D</span></div>
+            <div class="menu-entry" data-action="delete">Delete<span class="menu-shortcut">Del</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-entry" data-action="select-all">Select All<span class="menu-shortcut">Ctrl+A</span></div>
+            <div class="menu-entry" data-action="deselect">Deselect<span class="menu-shortcut">Esc</span></div>
+          </div>
+        </div>
+        <div class="menu-item" data-menu="view">
+          <span class="menu-label">View</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" data-action="world-settings">World Settings...</div>
+            <div class="menu-entry" data-action="toggle-grid">Toggle Grid<span class="menu-shortcut">G</span></div>
+            <div class="menu-entry" data-action="toggle-stats">Toggle Stats<span class="menu-shortcut">`</span></div>
+            <div class="menu-entry" data-action="toggle-topdown">Top-Down View<span class="menu-shortcut">T</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-entry" data-action="focus">Focus Selected<span class="menu-shortcut">F</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-entry" data-action="test">Play<span class="menu-shortcut">F5</span></div>
+          </div>
+        </div>
+        <div class="menu-item" data-menu="tools">
+          <span class="menu-label">Tools</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry menu-entry-inline">
+              <label>Grid Size:</label>
+              <input type="number" id="grid-size" value="1" min="0.25" max="10" step="0.25">
+            </div>
+            <div class="menu-entry menu-entry-inline">
+              <input type="checkbox" id="snap-toggle" checked>
+              <label for="snap-toggle">Snap to Grid</label>
+            </div>
+          </div>
+        </div>
+        <div id="play-spacer"></div>
+        <button id="play-toggle" title="Play (F5)">&#9654; Play</button>
+      </div>
+      <!-- Tool strip -->
+      <div id="toolbar-tools">
+        <!-- Select -->
+        <button class="tool-btn" title="Select (Q)" data-tool="select"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg></button>
+        <!-- Move -->
+        <button class="tool-btn active" title="Move (W)" data-tool="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l-3 3-3-3"/><path d="M19 9l3 3-3 3"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg></button>
+        <!-- Rotate -->
+        <button class="tool-btn" title="Rotate (E)" data-tool="rotate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+        <!-- Scale -->
+        <button class="tool-btn" title="Scale (R)" data-tool="scale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/><path d="M8 8l8 8"/></svg></button>
+        <div class="tool-sep"></div>
+        <!-- Paint -->
+        <button class="tool-btn" title="Paint" data-tool="paint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 3H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M12 11v4"/><path d="M8 15h8a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2z"/></svg></button>
+        <!-- Texture -->
+        <button class="tool-btn" title="Texture" data-tool="texture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></button>
+        <!-- Eyedropper -->
+        <button class="tool-btn" title="Eyedropper" data-tool="eyedropper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 22l1-1h3l9-9"/><path d="M3 21l9-9"/><circle cx="17" cy="7" r="4"/></svg></button>
+        <div class="tool-sep"></div>
+        <!-- Duplicate -->
+        <button class="tool-btn" title="Duplicate (Ctrl+D)" data-tool="duplicate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+        <!-- Delete -->
+        <button class="tool-btn" title="Delete (Del)" data-tool="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <div class="tool-sep"></div>
+        <!-- Grid toggle -->
+        <button class="tool-btn" title="Toggle Grid (G)" data-tool="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></button>
+        <!-- Snap toggle -->
+        <button class="tool-btn" title="Snap to Grid" data-tool="snap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3h16"/><path d="M4 21h16"/><path d="M3 4v16"/><path d="M21 4v16"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></button>
+        <div class="tool-sep"></div>
+        <!-- Top-Down toggle -->
+        <button class="tool-btn" title="Top-Down View (T)" data-tool="topdown"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></button>
+        <div class="tool-sep"></div>
+        <!-- Draw Wall -->
+        <button class="tool-btn" title="Draw Wall (1)" data-tool="draw-wall"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="18" x2="21" y2="6"/><line x1="2" y1="16" x2="20" y2="4"/></svg></button>
+        <!-- Draw Room -->
+        <button class="tool-btn" title="Draw Room (2)" data-tool="draw-room"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/></svg></button>
+        <!-- Draw Floor -->
+        <button class="tool-btn" title="Draw Floor (3)" data-tool="draw-floor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1" fill="currentColor" opacity="0.3"/><rect x="3" y="3" width="18" height="18" rx="1"/></svg></button>
+        <!-- Draw Door -->
+        <button class="tool-btn" title="Draw Door (4)" data-tool="draw-door"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="16" cy="13" r="1.5" fill="currentColor"/><path d="M8 22V2"/></svg></button>
+        <div class="tool-sep"></div>
+        <!-- Sculpt Raise -->
+        <button class="tool-btn" title="Sculpt Raise (5)" data-tool="sculpt-raise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l4-6 4 3 4-7 4 4"/><path d="M12 3v6"/><path d="M9 6l3-3 3 3"/></svg></button>
+        <!-- Sculpt Lower -->
+        <button class="tool-btn" title="Sculpt Lower (6)" data-tool="sculpt-lower"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l4 6 4-3 4 7 4-4"/><path d="M12 21v-6"/><path d="M9 18l3 3 3-3"/></svg></button>
+        <!-- Sculpt Smooth -->
+        <button class="tool-btn" title="Sculpt Smooth (7)" data-tool="sculpt-smooth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12c2-3 5-3 7 0s5 3 7 0 5-3 7 0"/></svg></button>
+        <!-- Sculpt Flatten -->
+        <button class="tool-btn" title="Sculpt Flatten (8)" data-tool="sculpt-flatten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><path d="M7 8l5 4 5-4"/></svg></button>
+        <div class="tool-sep"></div>
+        <!-- Road tool -->
+        <button class="tool-btn" title="Road (9)" data-tool="road"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15L8 3H10L15 15"/><path d="M5 10H13" stroke-dasharray="2 1.5"/><path d="M4 13H14"/></svg></button>
+        <!-- Sculpt options (hidden until sculpt active) -->
+        <div id="sculpt-opts" class="sculpt-opts" style="display:none">
+          <div class="tool-sep"></div>
+          <label class="sculpt-label">Radius</label>
+          <input type="range" id="sculpt-radius" class="sculpt-slider" min="1" max="50" value="5" step="1">
+          <span id="sculpt-radius-val" class="sculpt-val">5</span>
+          <label class="sculpt-label">Strength</label>
+          <input type="range" id="sculpt-strength" class="sculpt-slider" min="5" max="100" value="50" step="5">
+          <span id="sculpt-strength-val" class="sculpt-val">50%</span>
+        </div>
+        <!-- Road options (hidden until road active) -->
+        <div id="road-opts" class="road-opts" style="display:none">
+          <div class="tool-sep"></div>
+          <label class="road-label">Style</label>
+          <select id="road-style" class="road-select">
+            <option value="dirt">Dirt</option>
+            <option value="sand">Sand</option>
+            <option value="gravel">Gravel</option>
+            <option value="cobblestone">Cobble</option>
+            <option value="uk">UK Road</option>
+            <option value="usa">USA Road</option>
+            <option value="roman">Roman</option>
+            <option value="modern">Modern</option>
+          </select>
+          <label class="road-label">Width</label>
+          <input type="range" id="road-width" class="road-slider" min="0.5" max="12" value="1.5" step="0.5">
+          <span id="road-width-val" class="road-val">1.5</span>
+          <div class="tool-sep"></div>
+          <label class="road-label" for="road-pavements">Pavements</label>
+          <input type="checkbox" id="road-pavements" class="road-check">
+        </div>
+      </div>
+    </div>
+
+<div id="editor-wrap">
+
+  <!-- Left Panel: Objects + Scene -->
+  <div id="left-panel">
+    <div id="palette-section"></div>
+    <div id="hierarchy-section">
+      <h3>Scene</h3>
+      <input type="text" id="hierarchy-search" placeholder="Search...">
+      <div id="hierarchy-filters"></div>
+      <ul id="hierarchy-list"></ul>
+    </div>
+  </div>
+
+  <!-- Resize handle: left | viewport -->
+  <div class="resize-handle resize-h" id="resize-left"></div>
+
+  <!-- Center: Viewport -->
+  <div id="viewport-wrap">
+    <div id="canvas-wrap">
+      <canvas id="editor-canvas"></canvas>
+      <div id="quad-overlay">
+        <div id="quad-cross-v" class="quad-cross"></div>
+        <div class="quad-label" id="ql-0">3D</div>
+        <div id="pip-border" title="Click to swap view">
+          <span id="pip-label">Top-Down</span>
+        </div>
+      </div>
+    </div>
+    <div id="status-bar">
+      <span id="status-selection">No selection</span>
+      <span id="status-cursor"></span>
+      <span id="status-controls">WASD move | Right-drag look | Space up | Shift down | Scroll zoom | Click select | Dbl-click focus | Tab cycle | R resize | Ctrl+D dup | Esc deselect</span>
+      <span id="status-msg"></span>
+    </div>
+    <!-- Resize handle: viewport | bottom panel -->
+    <div class="resize-handle resize-v" id="resize-bottom"></div>
+    <!-- Bottom console panel -->
+    <div id="bottom-panel">
+      <div id="bottom-panel-header">
+        <span class="bottom-panel-title">Console</span>
+        <button id="btn-clear-console">Clear</button>
+        <button id="btn-toggle-console">&#9662;</button>
+      </div>
+      <div id="console-output"></div>
+    </div>
+  </div>
+
+  <!-- Resize handle: viewport | right -->
+  <div class="resize-handle resize-h" id="resize-right"></div>
+
+  <!-- Right Panel: Properties -->
+  <div id="right-panel">
+    <div id="props-header">
+      <h3>Properties</h3>
+      <div id="props-title"></div>
+    </div>
+    <div id="props-body">
+      <div id="props-empty"></div>
+    </div>
+    <div id="qp-main">
+      <div class="qp-tabs" id="qp-tab-bar"></div>
+      <div class="qp-tab-page" id="qp-actions-body"></div>
+      <div class="qp-tab-page" id="qp-changes-body" style="display:none"></div>
+      <div class="qp-tab-page" id="qp-notes-body" style="display:none"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Box select rubber band -->
+<div id="box-select-rect"></div>
+
+<!-- Three.js -->
+<script src="js/lib/three.min.js"></script>
+<script src="js/lib/GLTFLoader.js"></script>
+
+<!-- Core (shared with game) -->
+<script src="js/scene-id.js"></script>
+<script src="js/scene-schema.js"></script>
+<script src="js/scene-loader.js"></script>
+<script src="js/collision.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/face-material.js"></script>
+<script src="js/builder-single.js"></script>
+
+<script src="js/script-registry.js"></script>
+<script src="js/controls.js"></script>
+
+<!-- Editor modules -->
+<script src="js/editor/editor-history.js"></script>
+<script src="js/editor/editor-grid.js"></script>
+<script src="js/editor/editor-gizmo.js"></script>
+<script src="js/editor/editor-viewport.js"></script>
+<script src="js/editor/editor-quad.js"></script>
+<script src="js/editor/editor-panels.js"></script>
+<script src="js/editor/editor-scripts.js"></script>
+<script src="js/editor/editor-icons.js"></script>
+<script src="js/editor/editor-panel.js"></script>
+<script src="js/editor/editor-textures.js"></script>
+<script src="js/editor/editor-presets.js"></script>
+<script src="js/editor/editor-palette.js"></script>
+<script src="js/editor/editor-prefab.js"></script>
+<script src="js/editor/editor-io.js"></script>
+<script src="js/editor/editor-console.js"></script>
+<script src="js/editor/editor-layout.js"></script>
+<script src="js/editor/editor-project.js"></script>
+<script src="js/editor/editor-stats.js"></script>
+<script src="js/editor/editor-playtest.js"></script>
+<script src="js/editor/editor-skybox.js"></script>
+<script src="js/editor/editor-compass.js"></script>
+<script src="js/editor/editor-draw.js"></script>
+<script src="js/editor/editor-sculpt.js"></script>
+<script src="js/editor/editor-road.js"></script>
+<script src="js/editor/editor-assets.js"></script>
+<script src="js/editor/editor-main.js"></script>
+
+</body>
+</html>

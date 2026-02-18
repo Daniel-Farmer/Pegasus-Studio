@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pegasus Studio — Login</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a1a; color: #ddd; font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; min-height: 100vh;
+  }
+  .card {
+    background: #222; border-radius: 4px; padding: 36px; width: 360px;
+    border: 1px solid #333;
+  }
+  .tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #333; }
+  .tab {
+    flex: 1; text-align: center; padding: 8px; cursor: pointer; color: #888;
+    border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 12px;
+  }
+  .tab.active { color: #ddd; border-bottom-color: #5577aa; }
+  .tab:hover { color: #bbb; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; margin-bottom: 4px; font-size: 11px; color: #888; }
+  .field input {
+    width: 100%; padding: 8px 10px; background: #2a2a2a; border: 1px solid #333;
+    border-radius: 3px; color: #ddd; font-size: 13px; outline: none; font-family: inherit;
+  }
+  .field input:focus { border-color: #5577aa; }
+  .field input::placeholder { color: #555; }
+  .btn {
+    width: 100%; padding: 10px; background: #3a5577; color: #ddd; border: 1px solid #4a6888;
+    border-radius: 3px; font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s; font-family: inherit;
+  }
+  .btn:hover { background: #4a6888; color: #fff; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .error { color: #c55; font-size: 11px; margin-bottom: 10px; min-height: 1.2em; }
+  #username-field { display: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <img src="/pegasus-logo.webp" alt="Pegasus Studio" style="width:140px;margin:0 auto 16px;display:block;">
+  <div class="tabs">
+    <div class="tab active" data-mode="login">Login</div>
+    <div class="tab" data-mode="register">Register</div>
+  </div>
+  <form id="auth-form">
+    <div class="field" id="username-field">
+      <label>Username</label>
+      <input type="text" id="username" autocomplete="username" placeholder="Your username">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="email" autocomplete="email" placeholder="you@example.com" required>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" autocomplete="current-password" placeholder="Min 6 characters" required>
+    </div>
+    <div class="error" id="error-msg"></div>
+    <button type="submit" class="btn" id="submit-btn">Login</button>
+  </form>
+</div>
+
+<script>
+(function() {
+  var mode = 'login';
+  var tabs = document.querySelectorAll('.tab');
+  var usernameField = document.getElementById('username-field');
+  var submitBtn = document.getElementById('submit-btn');
+  var errorMsg = document.getElementById('error-msg');
+  var form = document.getElementById('auth-form');
+
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].addEventListener('click', function() {
+      mode = this.getAttribute('data-mode');
+      for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+      this.classList.add('active');
+      usernameField.style.display = mode === 'register' ? 'block' : 'none';
+      submitBtn.textContent = mode === 'login' ? 'Login' : 'Register';
+      errorMsg.textContent = '';
+    });
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    errorMsg.textContent = '';
+    submitBtn.disabled = true;
+
+    var email = document.getElementById('email').value;
+    var password = document.getElementById('password').value;
+    var payload, url;
+
+    if (mode === 'register') {
+      var username = document.getElementById('username').value;
+      payload = JSON.stringify({ username: username, email: email, password: password });
+      url = '/api/register';
+    } else {
+      payload = JSON.stringify({ email: email, password: password });
+      url = '/api/login';
+    }
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload
+    }).then(function(r) { return r.json().then(function(data) { return { status: r.status, data: data }; }); })
+    .then(function(result) {
+      submitBtn.disabled = false;
+      if (result.status >= 400) {
+        errorMsg.textContent = result.data.error || 'Something went wrong';
+      } else {
+        window.location.href = '/dashboard';
+      }
+    }).catch(function(err) {
+      submitBtn.disabled = false;
+      errorMsg.textContent = 'Network error';
+    });
+  });
+})();
+</script>
+</body>
+</html>
